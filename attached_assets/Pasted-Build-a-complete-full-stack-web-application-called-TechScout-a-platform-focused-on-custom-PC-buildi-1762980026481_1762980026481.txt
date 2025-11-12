@@ -1,0 +1,95 @@
+Build a complete full-stack web application called TechScout, a platform focused on custom PC building and tech product discovery. It is inspired by the features of pcbuilder.net and tailored for easy navigation, rich filtering, compatibility verification, and personalized recommendations. The app targets students, gamers, professionals, and general consumers.
+
+Overall Tech Stack:
+
+Frontend: React.js with Tailwind CSS for responsive and modern UI design.
+
+Backend: Node.js with Express.js providing REST APIs.
+
+Database: MongoDB to store products, builds, users, ratings, and preferences.
+
+Detailed Page Breakdown:
+
+Home Page:
+
+Welcoming landing page showcasing TechScout’s value propositions.
+
+Navigation links to Custom PC Builder, Product Finder, Product Comparison, Pre-Built PCs, Build Guide, and Contact pages.
+
+Highlights of featured builds and popular or new tech products.
+
+Custom PC Builder:
+
+Guided step-by-step component selection: CPU, GPU, RAM, Motherboard, PSU, Storage, Case, Cooling.
+
+Dynamic filtering by price, brand, and compatibility with already chosen components.
+
+Display real-time total price, power consumption estimation, and detailed specs with images.
+
+Save, share (generate unique links), or export build summaries.
+
+Product Finder:
+
+Searchable and filterable product catalog covering mice, keyboards, monitors, and more.
+
+Filters for category, price range, brand, features (wireless, RGB, mechanical switch), and user ratings.
+
+Ranked product cards with 'Best Pick' features and ratings.
+
+Product Comparison:
+
+Side-by-side comparison of up to three chosen products.
+
+Detailed comparison matrix including price, specs, ratings, warranty, and feature tags.
+
+Dynamic add/remove for compared products.
+
+Pre-Built PCs and Laptops:
+
+Page showcasing curated ready-to-buy PC configurations.
+
+Sort and filter options by use case, price, and brand.
+
+Build Guide:
+
+Detailed DIY assembly tutorials with text, images, and videos.
+
+Tips on compatibility, installation, and troubleshooting.
+
+User Profile:
+
+Manage saved builds, wishlists, and user preferences.
+
+Admin Dashboard:
+
+Manage all product data, categories, and user content.
+
+Contact/About Page:
+
+Company mission, team, and contact form with validation.
+
+Additional Features:
+
+Compatibility checks and alerts.
+
+Export build in formats like PDF.
+
+SEO optimization and accessibility considerations.
+
+Mobile-first, responsive design.
+
+User Experience & Tone:
+
+Professional yet approachable interface.
+
+Include tooltips and onscreen guidance.
+
+Offer shareable builds and collaboration links.
+
+Inspiration:
+Draw from pcbuilder.net’s intuitive compatibility system, filtering options, detailed specs display, and streamlined user flow.
+
+Extras:
+Include me ("Dumbo"), your AI assistant, for real-time help, product suggestions, budget tips, and compatibility advice across the site.
+
+Please generate a complete codebase including frontend, backend, database schemas, and API routes for this project.
