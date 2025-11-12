@@ -104,11 +104,108 @@ export default function PCBuilder() {
       }
     }
 
-    if (Object.keys(selectedComponents).length >= 3 && issues.length === 0 && cpu && motherboard) {
+    const gpu = selectedComponents.gpu as any;
+    const caseComp = selectedComponents.case as any;
+    const cooling = selectedComponents.cooling as any;
+    const storage = selectedComponents.storage as any;
+
+    if (motherboard && caseComp) {
+      const moboFormFactor = motherboard.specs.formFactor;
+      const caseFormFactor = caseComp.specs.formFactor;
+      
+      const compatibleFormFactors: Record<string, string[]> = {
+        "Mid-Tower": ["ATX", "Micro-ATX", "Mini-ITX"],
+        "Full-Tower": ["E-ATX", "ATX", "Micro-ATX", "Mini-ITX"],
+        "Mini-Tower": ["Micro-ATX", "Mini-ITX"]
+      };
+      
+      const allowedFormFactors = compatibleFormFactors[caseFormFactor] || [];
+      if (!allowedFormFactors.includes(moboFormFactor)) {
+        issues.push({
+          severity: "error",
+          message: `Motherboard form factor (${moboFormFactor}) is not compatible with case (${caseFormFactor})`,
+          affectedComponents: ["Motherboard", "Case"]
+        });
+      }
+    }
+
+    if (gpu && caseComp) {
+      const gpuLength = Number(gpu.specs.length) || 0;
+      if (gpuLength > 350) {
+        issues.push({
+          severity: "warning",
+          message: `GPU is ${gpuLength}mm long. Verify your case can accommodate this length.`,
+          affectedComponents: ["GPU", "Case"]
+        });
+      }
+    }
+
+    if (motherboard && ram) {
+      const ramCapacity = Number(ram.specs.capacity) || 0;
+      const maxRam = Number(motherboard.specs.maxRam) || 0;
+      
+      if (ramCapacity > maxRam) {
+        issues.push({
+          severity: "error",
+          message: `RAM capacity (${ramCapacity}GB) exceeds motherboard maximum (${maxRam}GB)`,
+          affectedComponents: ["RAM", "Motherboard"]
+        });
+      }
+    }
+
+    if (cpu && cooling) {
+      const coolerHeight = Number(cooling.specs.height) || 0;
+      if (coolerHeight > 200) {
+        issues.push({
+          severity: "warning",
+          message: `CPU cooler height is ${coolerHeight}mm. Ensure your case has adequate clearance.`,
+          affectedComponents: ["Cooling", "Case"]
+        });
+      }
+    }
+
+    if (motherboard && storage) {
+      if (storage.specs.type === "NVMe") {
+        const m2Slots = Number(motherboard.specs.m2Slots) || 0;
+        if (m2Slots === 0) {
+          issues.push({
+            severity: "error",
+            message: "NVMe storage requires M.2 slots, but motherboard has none",
+            affectedComponents: ["Storage", "Motherboard"]
+          });
+        }
+      }
+    }
+
+    if (cpu && !selectedComponents.cooling) {
+      issues.push({
+        severity: "warning",
+        message: "No cooling solution selected. CPU requires adequate cooling.",
+        affectedComponents: ["CPU", "Cooling"]
+      });
+    }
+
+    if (motherboard && !selectedComponents.psu) {
+      issues.push({
+        severity: "warning",
+        message: "No PSU selected. System requires a power supply.",
+        affectedComponents: ["PSU"]
+      });
+    }
+
+    if (!selectedComponents.storage && (cpu || gpu)) {
+      issues.push({
+        severity: "warning",
+        message: "No storage device selected. System needs storage to boot.",
+        affectedComponents: ["Storage"]
+      });
+    }
+
+    if (Object.keys(selectedComponents).length >= 3 && issues.filter(i => i.severity === "error").length === 0 && cpu && motherboard) {
       issues.push({
         severity: "info",
-        message: "Consider checking GPU clearance in your chosen case",
-        affectedComponents: ["GPU", "Case"]
+        message: "All selected components appear compatible. Continue building your PC!",
+        affectedComponents: []
       });
     }
 
@@ -126,21 +223,87 @@ export default function PCBuilder() {
     }
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Build Saved",
-      description: "Your build has been saved successfully.",
-    });
+  const handleSave = async () => {
+    try {
+      const componentIds: Record<string, string> = {};
+      Object.entries(selectedComponents).forEach(([key, component]) => {
+        if (component) {
+          componentIds[key] = component.id;
+        }
+      });
+
+      const buildData = {
+        name: `My Build ${new Date().toLocaleDateString()}`,
+        components: componentIds,
+        totalPrice,
+        estimatedPower,
+        isPublic: false,
+      };
+
+      const response = await fetch('/api/builds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildData),
+      });
+
+      if (!response.ok) throw new Error('Failed to save build');
+
+      const savedBuild = await response.json();
+      
+      toast({
+        title: "Build Saved",
+        description: `Your build has been saved successfully with ID: ${savedBuild.id}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save build. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleShare = () => {
-    const buildId = Math.random().toString(36).substring(7);
-    const shareUrl = `${window.location.origin}/build/${buildId}`;
-    navigator.clipboard.writeText(shareUrl);
-    toast({
-      title: "Share Link Copied",
-      description: "Build link has been copied to clipboard.",
-    });
+  const handleShare = async () => {
+    try {
+      const componentIds: Record<string, string> = {};
+      Object.entries(selectedComponents).forEach(([key, component]) => {
+        if (component) {
+          componentIds[key] = component.id;
+        }
+      });
+
+      const buildData = {
+        name: `Shared Build ${new Date().toLocaleDateString()}`,
+        components: componentIds,
+        totalPrice,
+        estimatedPower,
+        isPublic: true,
+      };
+
+      const response = await fetch('/api/builds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildData),
+      });
+
+      if (!response.ok) throw new Error('Failed to create share link');
+
+      const savedBuild = await response.json();
+      const shareUrl = `${window.location.origin}/build/${savedBuild.id}`;
+      
+      await navigator.clipboard.writeText(shareUrl);
+      
+      toast({
+        title: "Share Link Copied",
+        description: "Build link has been copied to clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate share link. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

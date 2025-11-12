@@ -10,6 +10,7 @@ import ProductFinder from "@/pages/ProductFinder";
 import ProductComparison from "@/pages/ProductComparison";
 import PreBuiltPCs from "@/pages/PreBuiltPCs";
 import BuildGuide from "@/pages/BuildGuide";
+import SharedBuild from "@/pages/SharedBuild";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/compare" component={ProductComparison} />
       <Route path="/pre-built" component={PreBuiltPCs} />
       <Route path="/guide" component={BuildGuide} />
+      <Route path="/build/:id" component={SharedBuild} />
       <Route component={NotFound} />
     </Switch>
   );
