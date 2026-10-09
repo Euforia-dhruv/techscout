@@ -37,6 +37,20 @@ function App() {
           <main className="flex-1">
             <Router />
           </main>
+          <footer className="border-t border-white/10 py-4">
+            <div className="mx-auto flex max-w-7xl justify-center px-4">
+              <a
+                href="https://ventriee.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Designed and developed by Ventriee"
+              >
+                Designed &amp; Developed by
+                <img src="/ventriee-emblem.png" alt="VENTRIEE" width={18} height={18} className="h-[18px] w-[18px] object-contain" />
+              </a>
+            </div>
+          </footer>
         </div>
         <Toaster />
       </TooltipProvider>
